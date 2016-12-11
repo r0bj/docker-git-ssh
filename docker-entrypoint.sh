@@ -29,6 +29,15 @@ if [ -d "/home/$SSH_USER/.ssh/authorized_keys" ]; then
     chmod 0600 /home/$SSH_USER/.ssh/authorized_keys
 fi
 
+if [ -n "$TIMEZONE" ]; then
+    apk add --no-cache tzdata
+    if [ -f /usr/share/zoneinfo/$TIMEZONE ]; then
+        cp /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+        echo "$TIMEZONE" >/etc/timezone
+    fi
+    apk del tzdata
+fi
+
 if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
 	# generate fresh rsa key
 	ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
