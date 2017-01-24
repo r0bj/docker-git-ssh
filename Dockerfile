@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.5
 
 RUN apk add --no-cache git openssh bash
 COPY docker-entrypoint.sh /docker-entrypoint.sh 
