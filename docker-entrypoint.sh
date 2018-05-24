@@ -14,17 +14,14 @@ if [ -n "$SSH_GID" ]; then
 fi
 
 adduser -D -s /bin/bash $OPTS $SSH_USER $SSH_USER
-# set some password to make accound unlocked for sshd
-# PasswordAuthentication is disabled in sshd 
-pass=$(echo fubar | mkpasswd)
-echo "$SSH_USER:${pass}" | chpasswd
+passwd -u $SSH_USER
 
 if [ -d "/home/$SSH_USER/.ssh" ]; then
     chown -R $(id -u $SSH_USER):$(id -g $SSH_USER) /home/$SSH_USER/.ssh
     chmod 0700 /home/$SSH_USER/.ssh
 fi
 
-if [ -d "/home/$SSH_USER/.ssh/authorized_keys" ]; then
+if [ -f "/home/$SSH_USER/.ssh/authorized_keys" ]; then
     chown -R $(id -u $SSH_USER):$(id -g $SSH_USER) /home/$SSH_USER/.ssh/authorized_keys
     chmod 0600 /home/$SSH_USER/.ssh/authorized_keys
 fi
@@ -38,16 +35,24 @@ if [ -n "$TIMEZONE" ]; then
     apk del tzdata
 fi
 
-if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
-	# generate fresh rsa key
-	ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
-fi
 if [ ! -f "/etc/ssh/ssh_host_dsa_key" ]; then
 	# generate fresh dsa key
 	ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
 fi
+if [ ! -f "/etc/ssh/ssh_host_ecdsa_key" ]; then
+	# generate fresh ecdsa key
+	ssh-keygen -f /etc/ssh/ssh_host_ecdsa_key -N '' -t ecdsa
+fi
+if [ ! -f "/etc/ssh/ssh_host_ed25519_key" ]; then
+        # generate fresh ed25519 key
+        ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N '' -t ed25519
+fi
+if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
+        # generate fresh rsa key
+        ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
+fi
 
-#prepare run dir
+# prepare run dir
 if [ ! -d "/var/run/sshd" ]; then
 	mkdir -p /var/run/sshd
 fi
